@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Alex Nguyen — Developer</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0a0a12;
@@ -371,7 +372,52 @@
   }
   .contact-link:hover{color:var(--neon);border-color:var(--neon);box-shadow:0 0 20px rgba(0,245,200,0.1),inset 0 0 20px rgba(0,245,200,0.05)}
 
-  /* Footer */
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 32px; right: 32px; z-index: 9999;
+    padding: 14px 24px; font-family: 'Fira Code', monospace; font-size: 13px;
+    border-left: 3px solid var(--neon); background: var(--surface);
+    color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    max-width: 320px;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast.error { border-left-color: var(--neon3); }
+  .toast.success { border-left-color: var(--neon); }
+
+  /* Form error */
+  .form-error {
+    font-family: 'Fira Code', monospace; font-size: 11px;
+    color: var(--neon3); margin-bottom: 12px; min-height: 16px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Loading state */
+  .form-submit.loading {
+    opacity: 0.7; pointer-events: none;
+  }
+  .form-submit.loading::after {
+    content: ' ⟳'; display: inline-block; animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* User info in nav */
+  .nav-user {
+    display: none; align-items: center; gap: 12px;
+  }
+  .nav-user.visible { display: flex; }
+  .nav-user-name {
+    font-family: 'Fira Code', monospace; font-size: 11px;
+    color: var(--neon); letter-spacing: 0.1em;
+  }
+  .btn-logout {
+    font-family: 'Fira Code', monospace; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--border); padding: 8px 16px;
+    cursor: none; transition: all 0.3s;
+  }
+  .btn-logout:hover { color: var(--neon3); border-color: var(--neon3); }
   footer{
     padding:32px 60px;border-top:1px solid var(--border);
     display:flex;justify-content:space-between;align-items:center;
@@ -420,9 +466,13 @@
     <li><a href="#projects">Dự án</a></li>
     <li><a href="#contact">Liên hệ</a></li>
   </ul>
-  <div class="nav-auth">
+  <div class="nav-auth" id="navAuth">
     <button class="btn-login" onclick="openModal('login')">Đăng nhập</button>
     <button class="btn-register" onclick="openModal('register')">Đăng ký</button>
+  </div>
+  <div class="nav-user" id="navUser">
+    <span class="nav-user-name" id="navUserName"></span>
+    <button class="btn-logout" onclick="handleLogout()">Đăng xuất</button>
   </div>
 </nav>
 
@@ -434,13 +484,14 @@
     <h2 class="modal-title">Đăng nhập</h2>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input class="form-input" type="email" placeholder="alex@example.com">
+      <input class="form-input" id="login-email" type="email" placeholder="alex@example.com">
     </div>
     <div class="form-group">
       <label class="form-label">Mật khẩu</label>
-      <input class="form-input" type="password" placeholder="••••••••">
+      <input class="form-input" id="login-password" type="password" placeholder="••••••••">
     </div>
-    <button class="form-submit">Đăng nhập →</button>
+    <div class="form-error" id="login-error"></div>
+    <button class="form-submit" id="login-btn" onclick="handleLogin()">Đăng nhập →</button>
     <div class="modal-switch">Chưa có tài khoản? <a href="#" onclick="switchModal('login','register');return false">Đăng ký ngay</a></div>
   </div>
 </div>
@@ -453,20 +504,24 @@
     <h2 class="modal-title">Đăng ký</h2>
     <div class="form-group">
       <label class="form-label">Họ tên</label>
-      <input class="form-input" type="text" placeholder="Nguyễn Văn A">
+      <input class="form-input" id="register-name" type="text" placeholder="Nguyễn Văn A">
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input class="form-input" type="email" placeholder="alex@example.com">
+      <input class="form-input" id="register-email" type="email" placeholder="alex@example.com">
     </div>
     <div class="form-group">
       <label class="form-label">Mật khẩu</label>
-      <input class="form-input" type="password" placeholder="••••••••">
+      <input class="form-input" id="register-password" type="password" placeholder="Tối thiểu 6 ký tự">
     </div>
-    <button class="form-submit">Tạo tài khoản →</button>
+    <div class="form-error" id="register-error"></div>
+    <button class="form-submit" id="register-btn" onclick="handleRegister()">Tạo tài khoản →</button>
     <div class="modal-switch">Đã có tài khoản? <a href="#" onclick="switchModal('register','login');return false">Đăng nhập</a></div>
   </div>
 </div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
 
 <!-- Hero -->
 <section id="hero">
@@ -653,7 +708,135 @@
 </footer>
 
 <script>
-  // Modal
+  // ── Supabase Config ──
+  // Bước 1: Vào https://supabase.com → tạo project miễn phí
+  // Bước 2: Vào Settings → API → copy URL và anon key dán vào đây
+  const SUPABASE_URL = 'https://project-omega-three-12.vercel.app/';   // ← đổi thành URL của anh
+  const SUPABASE_KEY = 'sb_publishable_iPq5NEXzdjkhzMjCE9NsoQ_egZCuO4X'; // ← đổi thành anon key
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ── Toast ──
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+    t.className = 'toast ' + type + ' show';
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function showError(id, msg) { document.getElementById(id).textContent = msg; }
+  function clearError(id)     { document.getElementById(id).textContent = ''; }
+
+  function setBtnLoading(btnId, loading, defaultText) {
+    const btn = document.getElementById(btnId);
+    btn.textContent       = loading ? 'Đang xử lý...' : defaultText;
+    btn.style.opacity     = loading ? '0.7' : '';
+    btn.style.pointerEvents = loading ? 'none' : '';
+  }
+
+  // ── Auth State ──
+  function updateNavAuth(user) {
+    const navAuth     = document.getElementById('navAuth');
+    const navUser     = document.getElementById('navUser');
+    const navUserName = document.getElementById('navUserName');
+    if (user) {
+      navAuth.style.display = 'none';
+      navUser.classList.add('visible');
+      const displayName = user.user_metadata?.name || user.email.split('@')[0];
+      navUserName.textContent = '// ' + displayName.split(' ').pop();
+    } else {
+      navAuth.style.display = 'flex';
+      navUser.classList.remove('visible');
+    }
+  }
+
+  // Kiểm tra session khi load trang
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    updateNavAuth(session?.user || null);
+  })();
+
+  // Lắng nghe thay đổi auth (đăng nhập / đăng xuất)
+  sb.auth.onAuthStateChange((_event, session) => {
+    updateNavAuth(session?.user || null);
+  });
+
+  // ── Đăng ký ──
+  async function handleRegister() {
+    clearError('register-error');
+    const name     = document.getElementById('register-name').value.trim();
+    const email    = document.getElementById('register-email').value.trim();
+    const password = document.getElementById('register-password').value;
+
+    if (!name || !email || !password) return showError('register-error', '⚠ Vui lòng điền đầy đủ thông tin.');
+    if (password.length < 6)         return showError('register-error', '⚠ Mật khẩu phải có ít nhất 6 ký tự.');
+
+    setBtnLoading('register-btn', true);
+    try {
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { name } }, // lưu tên vào user_metadata
+      });
+
+      if (error) return showError('register-error', '⚠ ' + error.message);
+
+      closeModal('register');
+      ['register-name','register-email','register-password'].forEach(id => document.getElementById(id).value = '');
+
+      // Supabase gửi email xác nhận theo mặc định
+      if (data.user && !data.session) {
+        showToast('Đăng ký thành công! Kiểm tra email để xác nhận tài khoản 📧');
+      } else {
+        showToast(`Chào mừng ${name}! Đăng ký thành công 🎉`);
+      }
+    } catch (err) {
+      showError('register-error', '⚠ Lỗi kết nối. Kiểm tra lại Supabase URL/Key.');
+    } finally {
+      setBtnLoading('register-btn', false, 'Tạo tài khoản →');
+    }
+  }
+
+  // ── Đăng nhập ──
+  async function handleLogin() {
+    clearError('login-error');
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    if (!email || !password) return showError('login-error', '⚠ Vui lòng nhập email và mật khẩu.');
+
+    setBtnLoading('login-btn', true);
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        const msg = error.message.includes('Invalid login') ? 'Email hoặc mật khẩu không đúng.' : error.message;
+        return showError('login-error', '⚠ ' + msg);
+      }
+
+      closeModal('login');
+      ['login-email','login-password'].forEach(id => document.getElementById(id).value = '');
+      const displayName = data.user.user_metadata?.name || email.split('@')[0];
+      showToast(`Chào mừng trở lại, ${displayName}! 👋`);
+    } catch (err) {
+      showError('login-error', '⚠ Lỗi kết nối. Kiểm tra lại Supabase URL/Key.');
+    } finally {
+      setBtnLoading('login-btn', false, 'Đăng nhập →');
+    }
+  }
+
+  // ── Đăng xuất ──
+  async function handleLogout() {
+    await sb.auth.signOut();
+    showToast('Đã đăng xuất thành công.');
+  }
+
+  // Enter key submit
+  document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  document.getElementById('register-password').addEventListener('keydown', e => { if (e.key === 'Enter') handleRegister(); });
+
+  // ── Modal ──
   function openModal(type) {
     document.getElementById('modal-' + type).classList.add('active');
     document.body.style.overflow = 'hidden';
