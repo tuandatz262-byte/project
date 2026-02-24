@@ -694,7 +694,7 @@
     <h2 class="contact-title">Hãy cùng<br><span class="gradient">làm việc</span></h2>
     <p class="contact-desc">Tôi luôn sẵn sàng cho những dự án thú vị và cơ hội hợp tác mới. Đừng ngại liên hệ!</p>
     <div class="contact-links">
-      <a href="mailto:alex@example.com" class="contact-link">📧 alex@example.com</a>
+      <a href="/cdn-cgi/l/email-protection#e0818c8598a08598818d908c85ce838f8d" class="contact-link">📧 <span class="__cf_email__" data-cfemail="cfaea3aab78faab7aea2bfa3aae1aca0a2">[email&#160;protected]</span></a>
       <a href="#" class="contact-link">💼 LinkedIn</a>
       <a href="#" class="contact-link">🐙 GitHub</a>
     </div>
@@ -707,15 +707,22 @@
   <span class="footer-neon">Designed & Built with ❤️</span>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // ── Supabase Config ──
   // Bước 1: Vào https://supabase.com → tạo project miễn phí
   // Bước 2: Vào Settings → API → copy URL và anon key dán vào đây
-  const SUPABASE_URL = 'https://lzbsafohqednhzepkruv.supabase.co';   // ← đổi thành URL của anh
-  const SUPABASE_KEY = 'sb_publishable_iPq5NEXzdjkhzMjCE9NsoQ_egZCuO4X'; // ← đổi thành anon key
+  const SUPABASE_URL = 'https://lzbsafohqednhzepkruv.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_iPq5NEXzdjkhzMjCE9NsoQ_egZCuO4X';
 
   const { createClient } = supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+    }
+  });
 
   // ── Toast ──
   function showToast(msg, type = 'success') {
@@ -806,12 +813,22 @@
 
     if (!email || !password) return showError('login-error', '⚠ Vui lòng nhập email và mật khẩu.');
 
-    setBtnLoading('login-btn', true);
+    setBtnLoading('login-btn', true, 'Đăng nhập →');
     try {
+      console.log('🔐 Đang đăng nhập...', email);
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      console.log('📦 Kết quả:', { data, error });
 
       if (error) {
-        const msg = error.message.includes('Invalid login') ? 'Email hoặc mật khẩu không đúng.' : error.message;
+        console.error('❌ Lỗi login:', error);
+        let msg = 'Đăng nhập thất bại.';
+        if (error.message.includes('Invalid login') || error.message.includes('invalid_credentials')) {
+          msg = 'Email hoặc mật khẩu không đúng.';
+        } else if (error.message.includes('Email not confirmed')) {
+          msg = 'Email chưa xác nhận. Kiểm tra hộp thư hoặc tắt xác nhận email trong Supabase.';
+        } else {
+          msg = error.message;
+        }
         return showError('login-error', '⚠ ' + msg);
       }
 
@@ -819,8 +836,10 @@
       ['login-email','login-password'].forEach(id => document.getElementById(id).value = '');
       const displayName = data.user.user_metadata?.name || email.split('@')[0];
       showToast(`Chào mừng trở lại, ${displayName}! 👋`);
+      updateNavAuth(data.user);
     } catch (err) {
-      showError('login-error', '⚠ Lỗi kết nối. Kiểm tra lại Supabase URL/Key.');
+      console.error('💥 Exception:', err);
+      showError('login-error', '⚠ Lỗi: ' + err.message);
     } finally {
       setBtnLoading('login-btn', false, 'Đăng nhập →');
     }
@@ -937,10 +956,4 @@
   document.addEventListener('mousemove', e => {
     const x = (e.clientX / window.innerWidth  - 0.5) * 30;
     const y = (e.clientY / window.innerHeight - 0.5) * 30;
-    document.querySelector('.blob-1').style.transform = `translate(${x}px,${y}px)`;
-    document.querySelector('.blob-2').style.transform = `translate(${-x}px,${-y}px)`;
-    document.querySelector('.blob-3').style.transform = `translate(${x*0.5}px,${y*0.5}px)`;
-  });
-</script>
-</body>
-</html>
+    document.querySelector('.blob-1').style.transform = `
