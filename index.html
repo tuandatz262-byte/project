@@ -7,14 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050508;
-    --surface: #0d0d14;
-    --border: #1a1a2e;
-    --neon: #00f5c8;
-    --neon2: #7b2fff;
-    --neon3: #ff2d9b;
-    --text: #e8e8f0;
-    --muted: #5a5a7a;
+    --bg: #0a0a12;
+    --surface: #13131f;
+    --border: #252540;
+    --neon: #00ffd0;
+    --neon2: #9b5fff;
+    --neon3: #ff4db8;
+    --text: #f0f0ff;
+    --muted: #8888aa;
   }
 
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -53,8 +53,8 @@
   .grid-bg {
     position: fixed; inset: 0;
     background-image:
-      linear-gradient(rgba(0,245,200,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,200,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(0,255,208,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,208,0.06) 1px, transparent 1px);
     background-size: 60px 60px; z-index: 0;
     animation: gridMove 20s linear infinite;
   }
@@ -63,7 +63,7 @@
   /* Blobs */
   .blob {
     position: fixed; border-radius: 50%;
-    filter: blur(120px); opacity: 0.12; z-index: 0;
+    filter: blur(100px); opacity: 0.22; z-index: 0;
     animation: blobFloat 8s ease-in-out infinite;
   }
   .blob-1{width:600px;height:600px;background:var(--neon2);top:-200px;right:-100px}
@@ -84,8 +84,9 @@
     background: rgba(5,5,8,0.75);
   }
   .logo {
-    font-family: 'Fira Code', monospace; font-size: 14px;
+    font-family: 'Fira Code', monospace; font-size: 15px;
     color: var(--neon); letter-spacing: 0.1em; text-decoration: none;
+    text-shadow: 0 0 16px rgba(0,255,208,0.5);
   }
   .logo span{color:var(--muted)}
 
@@ -197,7 +198,7 @@
   .hero-tag::before{content:'';width:40px;height:1px;background:var(--neon);display:block}
 
   .hero-name {
-    font-size:clamp(56px,10vw,120px); font-weight:900;
+    font-size:clamp(72px,12vw,150px); font-weight:900;
     line-height:0.92; letter-spacing:-2px; margin-bottom:24px;
     opacity:0; animation:fadeUp 0.8s ease 0.5s forwards;
   }
@@ -208,8 +209,8 @@
   }
 
   .hero-desc {
-    font-size:18px; font-weight:400; color:var(--muted);
-    max-width:500px; line-height:1.75; margin-bottom:48px;
+    font-size:20px; font-weight:400; color:var(--muted);
+    max-width:540px; line-height:1.75; margin-bottom:48px;
     opacity:0; animation:fadeUp 0.8s ease 0.7s forwards;
   }
 
@@ -257,8 +258,8 @@
   }
   .section-label::before{content:'//';opacity:0.5}
 
-  .section-title{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.08;letter-spacing:-1px;margin-bottom:24px}
-  .about-text{color:var(--muted);line-height:1.85;font-size:16px;font-weight:400;margin-bottom:16px}
+  .section-title{font-size:clamp(40px,6vw,68px);font-weight:800;line-height:1.08;letter-spacing:-1px;margin-bottom:24px}
+  .about-text{color:var(--muted);line-height:1.85;font-size:17px;font-weight:400;margin-bottom:16px}
 
   .about-stats{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:40px}
   .stat-box {
@@ -272,7 +273,7 @@
   }
   .stat-box:hover::before{transform:scaleX(1)}
   .stat-box:hover{border-color:rgba(0,245,200,0.3);transform:translateY(-4px)}
-  .stat-num{font-size:40px;font-weight:800;color:var(--neon);display:block;line-height:1;margin-bottom:8px}
+  .stat-num{font-size:44px;font-weight:800;color:var(--neon);display:block;line-height:1;margin-bottom:8px;text-shadow:0 0 20px rgba(0,255,208,0.5)}
   .stat-label{font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);letter-spacing:0.1em}
 
   .avatar-wrap{position:relative;display:flex;align-items:center;justify-content:center}
@@ -309,7 +310,7 @@
   .skill-item:hover::after{opacity:1}
   .skill-item:hover{border-color:rgba(0,245,200,0.3)}
   .skill-icon{font-size:28px;margin-bottom:16px;display:block}
-  .skill-name{font-size:18px;font-weight:700;margin-bottom:8px}
+  .skill-name{font-size:20px;font-weight:700;margin-bottom:8px}
   .skill-level{font-family:'Fira Code',monospace;font-size:11px;color:var(--neon);margin-bottom:16px}
   .skill-bar{height:2px;background:var(--border);overflow:hidden}
   .skill-fill {
@@ -346,8 +347,8 @@
   .project-row:hover::before{transform:scaleY(1)}
   .project-row:hover{background:rgba(0,245,200,0.03);border-color:rgba(0,245,200,0.2);transform:translateX(4px)}
   .project-num{font-family:'Fira Code',monospace;font-size:12px;color:var(--muted)}
-  .project-info h3{font-size:20px;font-weight:700;letter-spacing:-0.3px;margin-bottom:8px}
-  .project-info p{color:var(--muted);font-size:14px;font-weight:400;line-height:1.65}
+  .project-info h3{font-size:22px;font-weight:700;letter-spacing:-0.3px;margin-bottom:8px}
+  .project-info p{color:var(--muted);font-size:15px;font-weight:400;line-height:1.65}
   .project-tags{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
   .tag{font-family:'Fira Code',monospace;font-size:10px;padding:4px 10px;border:1px solid var(--border);color:var(--muted);letter-spacing:0.1em}
   .tag-neon{border-color:rgba(0,245,200,0.3);color:var(--neon)}
@@ -358,7 +359,7 @@
   #contact{padding:120px 60px;text-align:center;border-top:1px solid var(--border)}
   .contact-inner{max-width:700px;margin:0 auto}
   .contact-tag{font-family:'Fira Code',monospace;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--neon);margin-bottom:24px}
-  .contact-title{font-size:clamp(36px,6vw,72px);font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:24px}
+  .contact-title{font-size:clamp(48px,8vw,96px);font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:24px}
   .contact-title .gradient{background:linear-gradient(135deg,var(--neon),var(--neon3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
   .contact-desc{color:var(--muted);font-size:16px;line-height:1.7;margin-bottom:48px}
   .contact-links{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
